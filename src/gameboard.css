@@ -1,0 +1,12 @@
+.activeTile {
+  background-color: black;
+}
+
+.nonTile {
+  background-color: rgb(255, 0, 168);
+}
+
+.tile {
+  height: 50px;
+  width: 50px;
+}
