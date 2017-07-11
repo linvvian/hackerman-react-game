@@ -1,9 +1,9 @@
 .activeTile {
-  background-color: black;
+  background-color: #FF006B;
 }
 
 .nonTile {
-  background-color: rgb(255, 0, 168);
+  background-color: #1D063B;
 }
 
 .tile {

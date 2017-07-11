@@ -1,22 +1,29 @@
 import React from 'react'
 import './gameboard.css'
 import Character from './character'
+import Bomb from './bomb'
 
 class GameBoard extends React.Component {
 
   isTile = (tileValue, rowIndex, columnIndex) => {
     if (rowIndex === this.props.character.y && columnIndex === this.props.character.x && tileValue !== 0) {
-      return <Character />
+      return (
+        <div>
+          <Character />
+
+        </div>
+      )
     }
     if(tileValue === 1){
       return (
-        <td className='tile activeTile'>
+        <td id={`cell-${rowIndex}-${columnIndex}`} className='tile activeTile'>
+          <Bomb bombState={{'visibility': 'hidden'}}/>
         </td>
       )
     }
     else {
       return (
-        <td className='tile nonTile'>
+        <td id={`cell-${rowIndex}-${columnIndex}`} className='tile nonTile'>
         </td>
       )
     }
