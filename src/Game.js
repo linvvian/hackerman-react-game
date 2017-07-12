@@ -31,7 +31,8 @@ class Game extends Component {
       [0,1,0,1,0,1,0,1,0,1,0,1,0],
       [0,1,1,1,1,1,1,1,1,1,1,1,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0]
-    ]
+    ],
+      bombs: [],
     }
   }
 
@@ -116,12 +117,38 @@ class Game extends Component {
         }
         break;
       case 32:
-        // let bomb_cell = document.getElementById(`cell-${2}-${3}`)
-        // console.log(bomb_cell)
-        // bomb_cell.innerHTML = " "
+        const {x,y} = this.state.character
+        let board = [...this.state.board]
+        board[y][x] = 2
+        const bomb = {x, y}
+        this.setState({
+          board: board,
+          bombs: [...this.state.bombs, bomb ]
+        })
+        break
       default:
 
     }
+  }
+
+  findBombRadius = (tile, radius) => {
+    //return array of all tiles to be exploded
+
+  }
+
+  explodeBomb = () => {
+    let bombs = [...this.state.bombs]
+    const bomb = bombs.splice(0,1)[0]
+    let board = [...this.state.board]
+    board[bomb.y][bomb.x] = 3
+    this.setState({board, bombs}, () => setTimeout(() => this.resetTiles(bomb), 500))
+  }
+
+  resetTiles = (tile) => {
+    //if tile.x === this.state.character.x && tile.y === this.state.character.y //kill player
+    let board = [...this.state.board]
+    board[tile.y][tile.x] = 1
+    this.setState({board})
   }
 
   up = (event) => {
@@ -150,7 +177,7 @@ class Game extends Component {
       <div>
         <h1>Hackerman</h1>
         <h3>HACK OR BE HACKED</h3>
-        <GameBoard board={this.state.board} character={this.state.character}/>
+        <GameBoard board={this.state.board} character={this.state.character} explode={this.explodeBomb}/>
       </div>
     )
   }

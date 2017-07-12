@@ -2,6 +2,7 @@ import React from 'react'
 import './gameboard.css'
 import Character from './character'
 import Bomb from './bomb'
+import {Icon} from 'semantic-ui-react'
 
 class GameBoard extends React.Component {
 
@@ -16,14 +17,25 @@ class GameBoard extends React.Component {
     }
     if(tileValue === 1){
       return (
-        <td id={`cell-${rowIndex}-${columnIndex}`} className='tile activeTile'>
-          <Bomb bombState={{'visibility': 'hidden'}}/>
+        <td className='tile activeTile'>
+        </td>
+      )
+    } else if(tileValue === 2){
+      return (
+        <td className='tile activeTile'>
+          <Bomb explode={this.props.explode} />
+        </td>
+      )
+    } else if(tileValue === 3){
+      return (
+        <td className='tile activeTile'>
+          <Icon name='fire' size='large'/>
         </td>
       )
     }
-    else {
+     else {
       return (
-        <td id={`cell-${rowIndex}-${columnIndex}`} className='tile nonTile'>
+        <td className='tile nonTile'>
         </td>
       )
     }
