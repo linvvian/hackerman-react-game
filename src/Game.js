@@ -173,31 +173,65 @@ class Game extends Component {
 
   isPlayerDead = (bombRadii) => {
     const playerCoord = this.state.character
+    let isDead = false
     bombRadii.forEach((coord) => {
-      if(playerCoord.x === coord.x && playerCoord.y === playerCoord.y){
+      if(playerCoord.x === coord.x && playerCoord.y === coord.y){
         this.setState({
           character: {
             ...this.state.character,
             isAlive: false,
           }
         })
-        return true
+        isDead = true
       }
     })
-    return false
+    return isDead
   }
 
-  explodeBomb = () => {
-    let bombs = [...this.state.bombs]
-    const bomb = bombs.splice(0,1)[0]
+  timerGoOff = (bomb_tile) => {
+    const {x,y} = bomb_tile
+    if (this.state.board[y][x] === 2) {
+      this.explodeBomb(bomb_tile)
+    }
+
+  }
+
+  explodeBomb = (bomb_tile) => {
+    // let bombs = [...this.state.bombs]
+    // const bomb = bombs.splice(0,1)[0]
     let board = [...this.state.board]
-    const tilesToExplode = this.findBombRadius(bomb,2)
+    const tilesToExplode = this.findBombRadius(bomb_tile,2)
+    let chainedBombs = []
     for (let b = 0; b < tilesToExplode.length; b++) {
       const {x, y} = tilesToExplode[b]
-      board[y][x] = 3
-    }
+      switch (board[y][x]) {
+        case 1://open tile
+          board[y][x] = 3
+          break
+        case 2: //a bomb, this or another one
+          if (x !== bomb_tile.x || y !== bomb_tile.y) {
+            chainedBombs.push(Object.assign({}, tilesToExplode[b]))
+          }
+          board[y][x] = 3
+          break
+        default:
+          board[y][x] += 1
+
+      } //end switch
+
+    } //end for
+
     //board[bomb.y][bomb.x] = 3
-    this.setState({board, bombs}, () => setTimeout(() => this.resetTiles(tilesToExplode), 500))
+    this.setState({board}, () => this.postExplode(tilesToExplode, chainedBombs))
+  }
+
+  postExplode = (tilesToReset, chainedBombs) => {
+    const isDead = this.isPlayerDead(tilesToReset)
+    console.log(isDead)
+    setTimeout(() => this.resetTiles(tilesToReset), 1000)
+    for (let b = 0; b < chainedBombs.length; b++) {
+      setTimeout(() => this.explodeBomb(chainedBombs[b]), 100)
+    }
   }
 
   resetTiles = (tilesToReset) => {
@@ -205,7 +239,24 @@ class Game extends Component {
     let board = [...this.state.board]
     for (let b = 0; b < tilesToReset.length; b++) {
       const {x, y} = tilesToReset[b]
-      board[y][x] = 1
+      switch (board[y][x]) {
+        case 1://open tile
+          break
+        case 2: //a bomb, this or another one
+          break
+        case 3:
+          board[y][x] = 1
+          break
+        default:
+          board[y][x] -= 1
+
+      }
+      // if(board[y][x] === 3) {
+      //   board[y][x] = 1
+      // } else if (board[y][x] === 5) {
+      //   board[y][x] = 3
+      // }
+      //
     }
     this.setState({board})
   }
@@ -236,7 +287,7 @@ class Game extends Component {
       <div>
         <h1>Hackerman</h1>
         <h3>HACK OR BE HACKED</h3>
-        <BoardView board={this.state.board} character={this.state.character} explode={this.explodeBomb}/>
+        <BoardView board={this.state.board} character={this.state.character} timeExplode={this.timerGoOff}/>
       </div>
     )
   }

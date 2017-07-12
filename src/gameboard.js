@@ -22,10 +22,10 @@ class BoardView extends React.Component {
     } else if(tileValue === 2){
       return (
         <td className='tile activeTile'>
-          <Bomb explode={this.props.explode} />
+          <Bomb timeExplode={this.props.timeExplode} tile={{x:columnIndex, y:rowIndex}} />
         </td>
       )
-    } else if(tileValue === 3){
+    } else if(tileValue > 2){
       return (
         <td className='tile activeTile'>
           <Icon name='fire' />
