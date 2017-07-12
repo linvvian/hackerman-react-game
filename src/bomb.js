@@ -6,10 +6,10 @@ export default class Bomb extends React.Component {
   componentDidMount () {
     setTimeout(this.props.explode, 3000)
   }
-  render(){
-    return(
+  render () {
+    return (
       <div style={this.props.bombState}>
-        <Icon name='bomb' size='large'/>
+        <Icon name='bomb' size='large' />
       </div>
     )
   }

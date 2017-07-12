@@ -7,11 +7,10 @@ import {Icon} from 'semantic-ui-react'
 class BoardView extends React.Component {
 
   isTile = (tileValue, rowIndex, columnIndex) => {
-    if (rowIndex === this.props.character.y && columnIndex === this.props.character.x && tileValue !== 0) {
+    if (rowIndex === this.props.character.y && columnIndex === this.props.character.x) {
       return (
         <div>
           <Character />
-
         </div>
       )
     }
@@ -29,11 +28,11 @@ class BoardView extends React.Component {
     } else if(tileValue === 3){
       return (
         <td className='tile activeTile'>
-          <Icon name='fire' size='large'/>
+          <Icon name='fire' />
         </td>
       )
     }
-     else {
+    else {
       return (
         <td className='tile nonTile'>
         </td>

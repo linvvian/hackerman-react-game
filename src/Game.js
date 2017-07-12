@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Loop, Stage, TileMap } from 'react-game-kit'
 import Character from './character'
 import BoardView from './gameboard'
 import Bomb from './bomb'
@@ -14,6 +13,7 @@ class Game extends Component {
       character: {
         x: 1,
         y: 1,
+        isAlive: true,
       },
       board: [
       [0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -33,6 +33,10 @@ class Game extends Component {
       [0,0,0,0,0,0,0,0,0,0,0,0,0]
     ],
       bombs: [],
+      players: [
+        { player: 1, x: 1, y: 1, isAlive: true },
+        { player: 2, x: 11, y: 1, isAlive: true },
+      ],
     }
   }
 
@@ -165,6 +169,22 @@ class Game extends Component {
     }
 
     return tilesInRadius.filter(tile => this.tileCanBeExploded(tile))
+  }
+
+  isPlayerDead = (bombRadii) => {
+    const playerCoord = this.state.character
+    bombRadii.forEach((coord) => {
+      if(playerCoord.x === coord.x && playerCoord.y === playerCoord.y){
+        this.setState({
+          character: {
+            ...this.state.character,
+            isAlive: false,
+          }
+        })
+        return true
+      }
+    })
+    return false
   }
 
   explodeBomb = () => {
