@@ -4,17 +4,12 @@ import BoardView from './BoardView_Component/boardview'
 import Bomb from './Bomb_Component/bomb'
 
 class Game extends Component {
-  constructor(){
-    super()
+  constructor(props){
+    super(props)
 
     this.keys = {}
 
     this.state = {
-      character: {
-        x: 1,
-        y: 1,
-        isAlive: true,
-      },
       board: [
       [0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,1,1,1,1,1,1,1,1,1,1,1,0],
@@ -32,13 +27,17 @@ class Game extends Component {
       [0,1,1,1,1,1,1,1,1,1,1,1,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0]
     ],
-      bombs: [],
       players: [
         { player: 1, x: 1, y: 1, isAlive: true, color: 'white' },
         { player: 2, x: 11, y: 1, isAlive: true, color: 'blue' },
       ],
     }
   }
+
+   handleSendState = () => {
+     console.log(this.props.cableApp)
+     this.props.cableApp.state.send({...this.state})
+   }
 
   subscribe = (keys) => {
     window.addEventListener('keydown', this.down)
@@ -122,16 +121,14 @@ class Game extends Component {
         const bomb2 = { x: player2.x, y: player2.y}
         this.setState({
           board: board,
-          bombs: [...this.state.bombs, bomb2 ]
-        })
+        }, this.handleSendState)
         break
       case 32: //SPACEBAR BOMB
         board[player1.y][player1.x] = 2
         const bomb1 = { x: player1.x, y: player1.y}
         this.setState({
           board: board,
-          bombs: [...this.state.bombs, bomb1 ]
-        })
+        }, this.handleSendState)
         break
       default:
     }
@@ -139,7 +136,7 @@ class Game extends Component {
     this.setState({
       ...this.state,
       players: [player1, player2],
-    })
+    }, this.handleSendState)
   }
 
   tileCanBeExploded = (tile) => {
@@ -307,6 +304,15 @@ class Game extends Component {
      37, 39, 38, 40, 32
    ])
   //  LEFT, RIGHT, UP, DOWN, SPACE
+
+  console.log('mounted')
+  this.props.cableApp.state = this.props.cableApp.cable.subscriptions.create({channel: "GameChannel", room: "One" },
+     {
+       received: (state) => {
+         this.setState({ ...state })
+       }
+     })
+    console.log(this.props.cableApp.board)
   }
 
   render(){
