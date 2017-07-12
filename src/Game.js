@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Loop, Stage, TileMap } from 'react-game-kit'
 import Character from './character'
-import GameBoard from './gameboard'
+import BoardView from './gameboard'
 import Bomb from './bomb'
 
 class Game extends Component {
@@ -134,6 +134,7 @@ class Game extends Component {
   findBombRadius = (tile, radius) => {
     //return array of all tiles to be exploded
 
+
   }
 
   explodeBomb = () => {
@@ -177,7 +178,7 @@ class Game extends Component {
       <div>
         <h1>Hackerman</h1>
         <h3>HACK OR BE HACKED</h3>
-        <GameBoard board={this.state.board} character={this.state.character} explode={this.explodeBomb}/>
+        <BoardView board={this.state.board} character={this.state.character} explode={this.explodeBomb}/>
       </div>
     )
   }

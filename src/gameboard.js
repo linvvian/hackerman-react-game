@@ -4,7 +4,7 @@ import Character from './character'
 import Bomb from './bomb'
 import {Icon} from 'semantic-ui-react'
 
-class GameBoard extends React.Component {
+class BoardView extends React.Component {
 
   isTile = (tileValue, rowIndex, columnIndex) => {
     if (rowIndex === this.props.character.y && columnIndex === this.props.character.x && tileValue !== 0) {
@@ -58,4 +58,4 @@ class GameBoard extends React.Component {
   }
 }
 
-export default GameBoard
+export default BoardView
