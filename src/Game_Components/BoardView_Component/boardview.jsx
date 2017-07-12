@@ -35,7 +35,7 @@ class BoardView extends React.Component {
       )
     } else {
       return this.props.players.map((player) => {
-        if (rowIndex === player.y && columnIndex === player.x) {
+        if (rowIndex === player.y && columnIndex === player.x && player.isAlive) {
           return (
             <div>
               <Character color={player.color}/>

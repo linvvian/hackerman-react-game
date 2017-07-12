@@ -53,6 +53,7 @@ class Game extends Component {
 
   isTileValid = (direction, character) => {
     const { x, y } = character
+    if(!character.isAlive) return
     switch (direction) {
       case 'LEFT':
         return this.state.board[y][x-1] === 1 ? true : false
@@ -197,19 +198,24 @@ class Game extends Component {
   }
 
   isPlayerDead = (bombRadii) => {
-    const playerCoord = this.state.character
     let isDead = false
-    bombRadii.forEach((coord) => {
-      if(playerCoord.x === coord.x && playerCoord.y === coord.y){
-        this.setState({
-          character: {
-            ...this.state.character,
-            isAlive: false,
-          }
-        })
-        isDead = true
-      }
+    let players = [...this.state.players]
+
+    players.forEach((playerCoord) => {
+      bombRadii.forEach((coord) => {
+        if(playerCoord.x === coord.x && playerCoord.y === coord.y){
+          playerCoord.isAlive = false
+          playerCoord.x = 0
+          playerCoord.y = 0
+          isDead = true
+        }
+      })
     })
+
+    this.setState({
+      players: [...players]
+    })
+
     return isDead
   }
 
@@ -252,7 +258,6 @@ class Game extends Component {
 
   postExplode = (tilesToReset, chainedBombs) => {
     const isDead = this.isPlayerDead(tilesToReset)
-    console.log(isDead)
     setTimeout(() => this.resetTiles(tilesToReset), 1000)
     for (let b = 0; b < chainedBombs.length; b++) {
       setTimeout(() => this.explodeBomb(chainedBombs[b]), 100)
