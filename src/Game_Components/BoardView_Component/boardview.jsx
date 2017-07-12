@@ -1,7 +1,7 @@
 import React from 'react'
-import './gameboard.css'
-import Character from './character'
-import Bomb from './bomb'
+import './boardview.css'
+import Character from '../Character_Component/character'
+import Bomb from '../Bomb_Component/bomb'
 import {Icon} from 'semantic-ui-react'
 
 class BoardView extends React.Component {

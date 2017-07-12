@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 
-import Game from './Game'
+import Game from './Game_Components/game'
 
 class App extends Component {
-  render() {
+  render () {
     return (
-      <div className="App">
+      <div className='App'>
         <Game />
       </div>
     )
   }
 }
 
-export default App;
+export default App

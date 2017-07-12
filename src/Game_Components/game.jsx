@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import Character from './character'
-import BoardView from './gameboard'
-import Bomb from './bomb'
+import Character from './Character_Component/character'
+import BoardView from './BoardView_Component/boardview'
+import Bomb from './Bomb_Component/bomb'
 
 class Game extends Component {
   constructor(){
