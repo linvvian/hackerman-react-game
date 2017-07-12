@@ -34,8 +34,8 @@ class Game extends Component {
     ],
       bombs: [],
       players: [
-        { player: 1, x: 1, y: 1, isAlive: true },
-        { player: 2, x: 11, y: 1, isAlive: true },
+        { player: 1, x: 1, y: 1, isAlive: true, color: 'white' },
+        { player: 2, x: 11, y: 1, isAlive: true, color: 'blue' },
       ],
     }
   }
@@ -43,23 +43,16 @@ class Game extends Component {
   subscribe = (keys) => {
     window.addEventListener('keydown', this.down)
     window.addEventListener('keyup', this.up)
-
-    keys.forEach((key) => {
-      this.keys[key] = false
-    })
   }
 
   down = (event) => {
     let keyPressed = event.keyCode
-    if (event.keyCode in this.keys) {
-      event.preventDefault()
-      this.keys[event.keyCode] = true
-    }
+    event.preventDefault()
     this.move(keyPressed)
   }
 
-  isTileValid = (direction) => {
-    const { x, y } = this.state.character
+  isTileValid = (direction, character) => {
+    const { x, y } = character
     switch (direction) {
       case 'LEFT':
         return this.state.board[y][x-1] === 1 ? true : false
@@ -78,97 +71,129 @@ class Game extends Component {
   }
 
   move = (key) => {
-    console.log(this.state.character)
+    const player1 = {...this.state.players[0]}
+    const player2 = {...this.state.players[1]}
+    const board = [...this.state.board]
+
     switch (key) {
-      case 37:
-        if(this.isTileValid('LEFT')){
-          this.setState({
-            character: {
-              ...this.state.character,
-              x: this.state.character.x - 1,
-            }
-          })
+      case 37: //LEFT ARROW
+        if(this.isTileValid('LEFT', player1)){
+          player1.x = player1.x - 1
         }
         break;
-      case 39:
-        if(this.isTileValid('RIGHT')){
-          this.setState({
-            character: {
-              ...this.state.character,
-              x: this.state.character.x + 1,
-            }
-          })
+      case 39: //RIGHT ARROW
+        if(this.isTileValid('RIGHT', player1)){
+          player1.x = player1.x + 1
         }
         break;
-      case 38:
-        if(this.isTileValid('UP')){
-          this.setState({
-            character: {
-              ...this.state.character,
-              y: this.state.character.y - 1,
-            }
-          })
+      case 38: //UP ARROW
+        if(this.isTileValid('UP', player1)){
+          player1.y = player1.y - 1
         }
         break;
-      case 40:
-        if(this.isTileValid('DOWN')){
-          this.setState({
-            character: {
-              ...this.state.character,
-              y: this.state.character.y + 1,
-            }
-          })
+      case 40: //DOWN ARROW
+        if(this.isTileValid('DOWN', player1)){
+          player1.y = player1.y + 1
         }
         break;
-      case 32:
-        const {x,y} = this.state.character
-        let board = [...this.state.board]
-        board[y][x] = 2
-        const bomb = {x, y}
+      case 65: //A KEY LEFT
+        if(this.isTileValid('LEFT', player2)){
+          player2.x = player2.x - 1
+        }
+        break;
+      case 68: //D KEY RIGHT
+        if(this.isTileValid('RIGHT', player2)){
+          player2.x = player2.x + 1
+        }
+        break;
+      case 87: //W KEY UP
+        if(this.isTileValid('UP', player2)){
+          player2.y = player2.y - 1
+        }
+        break;
+      case 83: //S KEY DOWN
+        if(this.isTileValid('DOWN', player2)){
+          player2.y = player2.y + 1
+        }
+        break;
+      case 16: //LEFT SHIFT BOMB
+        board[player2.y][player2.x] = 2
+        const bomb2 = { x: player2.x, y: player2.y}
         this.setState({
           board: board,
-          bombs: [...this.state.bombs, bomb ]
+          bombs: [...this.state.bombs, bomb2 ]
+        })
+        break
+      case 32: //SPACEBAR BOMB
+        board[player1.y][player1.x] = 2
+        const bomb1 = { x: player1.x, y: player1.y}
+        this.setState({
+          board: board,
+          bombs: [...this.state.bombs, bomb1 ]
         })
         break
       default:
-
     }
+
+    this.setState({
+      ...this.state,
+      players: [player1, player2],
+    })
   }
 
   tileCanBeExploded = (tile) => {
     const {x,y} = tile
-    return this.state.board[y][x] !== 0
+
+    return tile !== 0
   }
 
+  isPastWall = (tiles) => {
+    let tilesInRadius = tiles
+    tilesInRadius.forEach((tile, index) => {
+      const {x,y} = tile
+      if (tile !== 0 && this.state.board[y][x] === 0){
+        tilesInRadius[index] = 0
+        let nextTo = index + 4
+        while(nextTo <= tilesInRadius.length) {
+          tilesInRadius[nextTo] = 0
+          nextTo += 3
+        }
+      }
+    })
+    return tilesInRadius
+  }
 
   findBombRadius = (tile, radius) => {
     //return array of all tiles to be exploded
     const {x,y} = tile
-    let tilesInRadius = [Object.assign({}, tile)]
+    let tilesInRadius = [{...tile}]
     for (let i = 0; i < radius; i++) {
-      if ( y + i + 1 < this.state.board.length) {
+      // DOWN RADIUS
+      // if ( y + i + 1 < this.state.board.length && this.state.board[x][y]) {
         tilesInRadius.push(Object.assign({}, tile,
           {y: y + i + 1}
         ))
-      }
-      if (y - i - 1 > 0) {
+      // }
+      // UP RADIUS
+      // if (y - i - 1 > 0) {
         tilesInRadius.push(Object.assign({}, tile,
           {y: y - i - 1}
         ))
-      }
-      if ( x + i + 1 < this.state.board.length) {
+      // }
+      // RIGHT RADIUS
+      // if ( x + i + 1 < this.state.board.length) {
         tilesInRadius.push(Object.assign({}, tile,
           {x: x + i + 1}
         ))
-      }
-      if (x - i - 1 > 0) {
+      // }
+      // LEFT RADIUS
+      // if (x - i - 1 > 0) {
         tilesInRadius.push(Object.assign({}, tile,
           {x: x - i - 1}
         ))
-      }
+      // }
     }
-
-    return tilesInRadius.filter(tile => this.tileCanBeExploded(tile))
+    return this.isPastWall(tilesInRadius).filter(tile => this.tileCanBeExploded(tile))
   }
 
   isPlayerDead = (bombRadii) => {
@@ -211,16 +236,13 @@ class Game extends Component {
   }
 
   up = (event) => {
-    if (event.keyCode in this.keys) {
-      event.preventDefault()
-      this.keys[event.keyCode] = false
-    }
-    this.setState({
-      character: {
-        ...this.state.character,
-        characterState: 2,
-      }
-    })
+    event.preventDefault()
+    // this.setState({
+    //   character: {
+    //     ...this.state.character,
+    //     characterState: 2,
+    //   }
+    // })
   }
 
 
@@ -236,7 +258,7 @@ class Game extends Component {
       <div>
         <h1>Hackerman</h1>
         <h3>HACK OR BE HACKED</h3>
-        <BoardView board={this.state.board} character={this.state.character} explode={this.explodeBomb}/>
+        <BoardView board={this.state.board} players={this.state.players} character={this.state.character} explode={this.explodeBomb}/>
       </div>
     )
   }

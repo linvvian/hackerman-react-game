@@ -4,7 +4,7 @@ export default class Character extends Component {
 
   render(){
     return (
-      <td className='character' style={{'backgroundColor': 'white'}}>
+      <td className='character' style={{'backgroundColor': this.props.color}}>
       </td>
     )
   }
