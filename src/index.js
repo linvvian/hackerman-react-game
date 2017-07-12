@@ -7,7 +7,7 @@ import 'semantic-ui-css/semantic.min.css'
 
 import actionCable from 'actioncable'
 const CableApp = {}
-CableApp.cable = actionCable.createConsumer(`ws://${window.location.hostname}:3000/game`)
+CableApp.cable = actionCable.createConsumer('ws://192.168.6.188:3000/game')
 
 ReactDOM.render(<App cableApp={CableApp} />, document.getElementById('root'))
 registerServiceWorker()
