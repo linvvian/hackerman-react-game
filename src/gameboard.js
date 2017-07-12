@@ -2,40 +2,27 @@ import React from 'react'
 import './gameboard.css'
 import Character from './character'
 import Bomb from './bomb'
-import {Icon} from 'semantic-ui-react'
 
 class GameBoard extends React.Component {
 
   isTile = (tileValue, rowIndex, columnIndex) => {
-    if (rowIndex === this.props.character.y && columnIndex === this.props.character.x && tileValue !== 0) {
+    if (rowIndex === this.props.character.y && columnIndex === this.props.character.x) {
       return (
         <div>
           <Character />
-
         </div>
       )
     }
     if(tileValue === 1){
       return (
-        <td className='tile activeTile'>
-        </td>
-      )
-    } else if(tileValue === 2){
-      return (
-        <td className='tile activeTile'>
-          <Bomb explode={this.props.explode} />
-        </td>
-      )
-    } else if(tileValue === 3){
-      return (
-        <td className='tile activeTile'>
-          <Icon name='fire' size='large'/>
+        <td id={`cell-${rowIndex}-${columnIndex}`} className='tile activeTile'>
+          <Bomb bombState={{'visibility': 'hidden'}}/>
         </td>
       )
     }
-     else {
+    else {
       return (
-        <td className='tile nonTile'>
+        <td id={`cell-${rowIndex}-${columnIndex}`} className='tile nonTile'>
         </td>
       )
     }

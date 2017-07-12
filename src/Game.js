@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Loop, Stage, TileMap } from 'react-game-kit'
 import Character from './character'
 import GameBoard from './gameboard'
 import Bomb from './bomb'
@@ -14,6 +13,7 @@ class Game extends Component {
       character: {
         x: 1,
         y: 1,
+        isAlive: true,
       },
       board: [
       [0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -33,6 +33,10 @@ class Game extends Component {
       [0,0,0,0,0,0,0,0,0,0,0,0,0]
     ],
       bombs: [],
+      players: [
+        { player: 1, x: 1, y: 1, isAlive: true },
+        { player: 2, x: 11, y: 1, isAlive: true },
+      ],
     }
   }
 
@@ -136,6 +140,22 @@ class Game extends Component {
 
   }
 
+  isPlayerDead = (bombRadii) => {
+    const playerCoord = this.state.character
+    bombRadii.forEach((coord) => {
+      if(playerCoord.x === coord.x && playerCoord.y === playerCoord.y){
+        this.setState({
+          character: {
+            ...this.state.character,
+            isAlive: false,
+          }
+        })
+        return true
+      }
+    })
+    return false
+  }
+
   explodeBomb = () => {
     let bombs = [...this.state.bombs]
     const bomb = bombs.splice(0,1)[0]
@@ -177,7 +197,7 @@ class Game extends Component {
       <div>
         <h1>Hackerman</h1>
         <h3>HACK OR BE HACKED</h3>
-        <GameBoard board={this.state.board} character={this.state.character} explode={this.explodeBomb}/>
+        <GameBoard board={this.state.board} players={this.state.players} character={this.state.character} explode={this.explodeBomb}/>
       </div>
     )
   }
