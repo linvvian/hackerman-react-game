@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import BoardView from './BoardView_Component/boardview'
-import JoinButton from './join_game_button'
+import JoinButton from './Button_Component/join_game_button'
+import StartButton from './Button_Component/start_game_button'
 
 class Game extends Component {
   constructor(props){
@@ -61,7 +62,6 @@ class Game extends Component {
 
 
    handleSendState = () => {
-     console.log(this.player_id)
      this.props.cableApp.state.send({...this.state})
    }
 
@@ -145,10 +145,12 @@ class Game extends Component {
     const index = players.indexOf(this.myPlayer())
     players[index] = player1
 
+
       this.setState({
         ...this.state,
         players: players,
       }, this.handleSendState)
+
   }
 
   //explosion functions
@@ -277,8 +279,6 @@ class Game extends Component {
     this.setState({board})
   }
 
-
-
   generateBlocks = () => {
     let blockCount = 100
     let board = [...this.state.board]
@@ -290,17 +290,19 @@ class Game extends Component {
       notBlocks.push(`${player.x},${player.y+1}`)
       notBlocks.push(`${player.x},${player.y-1}`)
     })
-    board.forEach((row, rowIndex) => {
-      row.forEach((tile, columnIndex) => {
-        const coordinates = `${columnIndex},${rowIndex}`
-        if(!notBlocks.includes(coordinates) && blockCount > 0 && board[rowIndex][columnIndex] !== 0 && Math.round(Math.random() * 1)){
-          board[rowIndex][columnIndex] = 5
-          blockCount -= 1
-        }
+    while(blockCount > 0){
+      board.forEach((row, rowIndex) => {
+        row.forEach((tile, columnIndex) => {
+          const coordinates = `${columnIndex},${rowIndex}`
+          if(!notBlocks.includes(coordinates) && board[rowIndex][columnIndex] !== 0 && Math.round(Math.random() * 1)){
+            board[rowIndex][columnIndex] = 5
+            blockCount -= 1
+          }
+        })
       })
-    })
+    }
     this.setState({
-      board: board
+      board: board,
     })
   }
 
@@ -315,8 +317,12 @@ class Game extends Component {
     return false
   }
 
+  // adds players based on the number of players existing
   handleClick = (event) => {
     event.preventDefault()
+
+    if(this.myPlayer() || this.state.players.length >= 4) return
+
     const index = this.state.players.length
     const array = [{x: 1, y: 1}, {x: 11, y: 1}, {}]
     const startingCrd = array[index]
@@ -326,10 +332,26 @@ class Game extends Component {
       newState.players = newState.players.filter(player => !!player.x)
       newState.players.push({player: index+1, ...startingCrd, isAlive: true, color: colors[index], player_id: this.player_id })
     }
+
     this.setState({
       ...newState,
     }, this.handleSendState)
 
+  }
+
+  startGame = (event) => {
+    event.preventDefault()
+    let newState = {...this.state}
+    const array = [{x: 1, y: 1}, {x: 11, y: 1}, {x: 1, y: 13}, {x: 11, y: 13}]
+    newState.players.forEach((player, index) => {
+      player.x = array[index].x
+      player.y = array[index].y
+      player.isAlive = true
+    })
+    this.generateBlocks()
+    this.setState({
+      ...newState,
+    })
   }
 
   render(){
@@ -338,6 +360,7 @@ class Game extends Component {
         <h1>Hackerman</h1>
         <h3>HACK OR BE HACKED</h3>
         <JoinButton onClick={this.handleClick}/>
+        <StartButton onClick={this.startGame}/>
 
         <BoardView board={this.state.board} players={this.state.players} character={this.state.character} timeExplode={this.timerGoOff}/>
 
