@@ -339,14 +339,18 @@ class Game extends Component {
 
   handleClick = (event) => {
     event.preventDefault()
+    if(this.myPlayer() || this.players.lenght < 4) return
+
     const index = this.state.players.length
-    const array = [{x: 1, y: 1}, {x: 11, y: 1}]
+    const array = [{x: 1, y: 1}, {x: 11, y: 1}, {x: 1, y: 13}, {x: 11, y: 13}]
+    const colors = ['white', 'blue', '#E1FFAA', '#8000FF']
     const startingCrd = array[index]
+    const myColor = colors[index]
     let newState = {...this.state}
 
     if (!this.checkPlayers(this.state.players, this.player_id)) {
       newState.players = newState.players.filter(player => !!player.x)
-      newState.players.push({player: index+1, ...startingCrd, isAlive: true, color: 'white', player_id: this.player_id })
+      newState.players.push({player: index+1, ...startingCrd, isAlive: true, color: myColor, player_id: this.player_id })
     }
     this.setState({
       ...newState,
