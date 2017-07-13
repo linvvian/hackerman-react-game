@@ -31,7 +31,7 @@ class Game extends Component {
 
   componentWillMount = () => {
     this.player_id = Math.random().toString(36).substring(7)
-    this.bomb_radius = 1
+    this.bomb_radius = 2
   }
 
   componentDidMount(){
@@ -107,7 +107,6 @@ class Game extends Component {
   move = (key) => {
     let player1
     player1 = this.myPlayer()
-    console.log(this.state.players)
     const board = [...this.state.board]
 
     switch (key) {
@@ -150,7 +149,6 @@ class Game extends Component {
         ...this.state,
         players: players,
       }, this.handleSendState)
-
   }
 
   //explosion functions
@@ -163,17 +161,28 @@ class Game extends Component {
 
   isPastWall = (tiles) => {
     let tilesInRadius = tiles
+    console.log(tilesInRadius)
+
     tilesInRadius.forEach((tile, index) => {
       const {x,y} = tile
-      if (tile !== 0 && this.state.board[y][x] === 0){
+      if (tile === 0) return
+      if (this.state.board[y][x] === 0){
         tilesInRadius[index] = 0
         let nextTo = index + 4
         while(nextTo <= tilesInRadius.length) {
           tilesInRadius[nextTo] = 0
-          nextTo += 3
+          nextTo += 4
+        }
+      } else if (this.state.board[y][x] === 5){
+        // tilesInRadius[index] = 0
+        let nextTo = index + 4
+        while(nextTo <= tilesInRadius.length) {
+          tilesInRadius[nextTo] = 0
+          nextTo += 4
         }
       }
     })
+    console.log(tilesInRadius)
     return tilesInRadius
   }
 
@@ -219,6 +228,8 @@ class Game extends Component {
       const tile_value = board[y][x]
 
       if (tile_value > 1 && tile_value < 5) {
+        board[y][x] = 11
+      } else if (tile_value === 5) {
         board[y][x] = 11
       } else if (tile_value < 11) {
         if ( x !== bomb.x || y !== bomb.y) {
