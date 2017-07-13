@@ -14,7 +14,6 @@ class BoardView extends React.Component {
     }
   }
 
-
   isTile = (tileValue, rowIndex, columnIndex) => {
     const coords = this.props.players.map((player) => {
       return `${player.x},${player.y}`
@@ -26,10 +25,16 @@ class BoardView extends React.Component {
           {this.isCharacter(coords, currentCoord)}
         </td>
       )
-    }  else if(tileValue === 5){
+    } else if(tileValue === 5){
       return (
         <td className='tile activeTile'>
           <Block />
+        </td>
+      )
+    } else if(tileValue === 3 || tileValue === 2){
+      return (
+        <td className='tile activeTile'>
+          powerUp
         </td>
       )
     } else if(tileValue > 5 && tileValue < 11){

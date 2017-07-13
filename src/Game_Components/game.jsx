@@ -3,27 +3,31 @@ import BoardView from './BoardView_Component/boardview'
 import JoinButton from './Button_Component/join_game_button'
 import StartButton from './Button_Component/start_game_button'
 
+const initBoard = [
+[0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,1,0,1,0,1,0,1,0,1,0,1,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,1,0,1,0,1,0,1,0,1,0,1,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,1,0,1,0,1,0,1,0,1,0,1,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,1,0,1,0,1,0,1,0,1,0,1,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,1,0,1,0,1,0,1,0,1,0,1,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,1,0,1,0,1,0,1,0,1,0,1,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0]
+]
+
 class Game extends Component {
   constructor(props){
     super(props)
 
     this.state = {
       board: [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,1,1,1,1,1,1,1,1,1,1,1,0],
-      [0,1,0,1,0,1,0,1,0,1,0,1,0],
-      [0,1,1,1,1,1,1,1,1,1,1,1,0],
-      [0,1,0,1,0,1,0,1,0,1,0,1,0],
-      [0,1,1,1,1,1,1,1,1,1,1,1,0],
-      [0,1,0,1,0,1,0,1,0,1,0,1,0],
-      [0,1,1,1,1,1,1,1,1,1,1,1,0],
-      [0,1,0,1,0,1,0,1,0,1,0,1,0],
-      [0,1,1,1,1,1,1,1,1,1,1,1,0],
-      [0,1,0,1,0,1,0,1,0,1,0,1,0],
-      [0,1,1,1,1,1,1,1,1,1,1,1,0],
-      [0,1,0,1,0,1,0,1,0,1,0,1,0],
-      [0,1,1,1,1,1,1,1,1,1,1,1,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0]
+        ...initBoard
     ],
       players: [],
     }
@@ -103,10 +107,16 @@ class Game extends Component {
     }
   }
 
+  isPowerUp = (tileValue) => {
+    const random = Math.round(Math.random() * 1)
+    if (tileValue !== 5) return
+
+  }
 
   move = (key) => {
     let player1
     player1 = this.myPlayer()
+    if(!this.myPlayer().isAlive) return
     const board = [...this.state.board]
 
     switch (key) {
@@ -161,7 +171,6 @@ class Game extends Component {
 
   isPastWall = (tiles) => {
     let tilesInRadius = tiles
-    console.log(tilesInRadius)
 
     tilesInRadius.forEach((tile, index) => {
       const {x,y} = tile
@@ -172,17 +181,16 @@ class Game extends Component {
         while(nextTo <= tilesInRadius.length) {
           tilesInRadius[nextTo] = 0
           nextTo += 4
-        }
+        } //to find walls and prevent fire past it
       } else if (this.state.board[y][x] === 5){
-        // tilesInRadius[index] = 0
         let nextTo = index + 4
         while(nextTo <= tilesInRadius.length) {
           tilesInRadius[nextTo] = 0
           nextTo += 4
         }
-      }
+      } //to find blocks and prevent fire past it
     })
-    console.log(tilesInRadius)
+
     return tilesInRadius
   }
 
@@ -230,7 +238,8 @@ class Game extends Component {
       if (tile_value > 1 && tile_value < 5) {
         board[y][x] = 11
       } else if (tile_value === 5) {
-        board[y][x] = 11
+        let tileValues = [2,3,11,11,11]
+        board[y][x] = shuffle(tileValues)[0]
       } else if (tile_value < 11) {
         if ( x !== bomb.x || y !== bomb.y) {
               const newBomb = {x, y, value: tile_value}
@@ -242,7 +251,6 @@ class Game extends Component {
       }
 
     } //end for
-
     this.setState({board}, () => this.postExplode(tilesToExplode, chainedBombs))
   }
 
@@ -291,7 +299,7 @@ class Game extends Component {
   }
 
   generateBlocks = () => {
-    let blockCount = 100
+    let blockCount = 75
     let board = [...this.state.board]
     let notBlocks = []
     this.state.players.forEach((player) => {
@@ -301,6 +309,7 @@ class Game extends Component {
       notBlocks.push(`${player.x},${player.y+1}`)
       notBlocks.push(`${player.x},${player.y-1}`)
     })
+
     while(blockCount > 0){
       board.forEach((row, rowIndex) => {
         row.forEach((tile, columnIndex) => {
@@ -312,12 +321,11 @@ class Game extends Component {
         })
       })
     }
+
     this.setState({
       board: board,
     })
   }
-
-
 
   checkPlayers = (players, playerId) => {
     for (let i = 0 ; i < players.length; i++ ) {
@@ -381,3 +389,14 @@ class Game extends Component {
 }
 
 export default Game
+
+function shuffle(a) {
+  var j, x, i;
+  for (i = a.length; i; i--) {
+    j = Math.floor(Math.random() * i);
+    x = a[i - 1];
+    a[i - 1] = a[j];
+    a[j] = x;
+  }
+  return a
+}
