@@ -6,14 +6,23 @@ import {Icon} from 'semantic-ui-react'
 
 class BoardView extends React.Component {
 
+  isCharacter = (coords, currentCoord) => {
+    const index = coords.indexOf(currentCoord)
+    if (coords.includes(currentCoord)) {
+      return <Character color={this.props.players[index].color}/>
+    }
+  }
+
+
   isTile = (tileValue, rowIndex, columnIndex) => {
     const coords = this.props.players.map((player) => {
       return `${player.x},${player.y}`
     })
     const currentCoord = `${columnIndex},${rowIndex}`
-    if(tileValue === 1 && !coords.includes(currentCoord)){
+    if(tileValue === 1){
       return (
         <td className='tile activeTile'>
+          {this.isCharacter(coords, currentCoord)}
         </td>
       )
     } else if(tileValue === 2){
@@ -28,28 +37,11 @@ class BoardView extends React.Component {
           <Icon name='fire' />
         </td>
       )
-    } else if(tileValue === 0){
+    } else {
       return (
         <td className='tile nonTile'>
         </td>
       )
-    } else {
-      if (!!this.props.players.reduce(function(a,b){return a.x === b.x && a.y===b.y ? a : NaN})) {
-        return (
-          <td>
-            <Character color={this.props.players[0].color}/>
-          </td>
-        )
-      }
-      return this.props.players.map((player) => {
-        if (rowIndex === player.y && columnIndex === player.x && player.isAlive) {
-          return (
-            <td>
-              <Character color={player.color}/>
-            </td>
-          )
-        }
-      })
     }
   }
 
