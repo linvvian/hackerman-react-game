@@ -1,6 +1,8 @@
 import React from 'react'
 import './block.css'
 
-const Block = ({ }) => <div className='block'></div>
+const Block = ({ }) => {
+  return <div className='block'></div>
+}
 
 export default Block

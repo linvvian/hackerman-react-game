@@ -1,13 +1,10 @@
 import React, { Component } from 'react'
-import Character from './Character_Component/character'
 import BoardView from './BoardView_Component/boardview'
-import Bomb from './Bomb_Component/bomb'
+import JoinButton from './join_game_button'
 
 class Game extends Component {
   constructor(props){
     super(props)
-
-    this.keys = {}
 
     this.state = {
       board: [
@@ -27,15 +24,16 @@ class Game extends Component {
       [0,1,1,1,1,1,1,1,1,1,1,1,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0]
     ],
-      players: [
-        { player: 1, x: 1, y: 1, isAlive: true, color: 'white' },
-        { player: 2, x: 11, y: 1, isAlive: true, color: 'blue' },
-      ],
+      players: [],
     }
   }
 
+  componentWillMount = () => {
+    this.player_id = Math.random().toString(36).substring(7)
+  }
+
    handleSendState = () => {
-     console.log(this.props.cableApp)
+     console.log(this.player_id)
      this.props.cableApp.state.send({...this.state})
    }
 
@@ -70,9 +68,20 @@ class Game extends Component {
     }
   }
 
+  myPlayer = () => {
+    let result = false
+    this.state.players.forEach((player) => {
+      if(player.player_id === this.player_id){
+        result = player
+      }
+    })
+    return result
+  }
+
   move = (key) => {
-    const player1 = {...this.state.players[0]}
-    const player2 = {...this.state.players[1]}
+    let player1
+    player1 = this.myPlayer()
+    console.log(this.state.players)
     const board = [...this.state.board]
 
     switch (key) {
@@ -96,33 +105,6 @@ class Game extends Component {
           player1.y = player1.y + 1
         }
         break;
-      case 65: //A KEY LEFT
-        if(this.isTileValid('LEFT', player2)){
-          player2.x = player2.x - 1
-        }
-        break;
-      case 68: //D KEY RIGHT
-        if(this.isTileValid('RIGHT', player2)){
-          player2.x = player2.x + 1
-        }
-        break;
-      case 87: //W KEY UP
-        if(this.isTileValid('UP', player2)){
-          player2.y = player2.y - 1
-        }
-        break;
-      case 83: //S KEY DOWN
-        if(this.isTileValid('DOWN', player2)){
-          player2.y = player2.y + 1
-        }
-        break;
-      case 16: //LEFT SHIFT BOMB
-        board[player2.y][player2.x] = 2
-        const bomb2 = { x: player2.x, y: player2.y}
-        this.setState({
-          board: board,
-        }, this.handleSendState)
-        break
       case 32: //SPACEBAR BOMB
         board[player1.y][player1.x] = 2
         const bomb1 = { x: player1.x, y: player1.y}
@@ -133,10 +115,16 @@ class Game extends Component {
       default:
     }
 
-    this.setState({
-      ...this.state,
-      players: [player1, player2],
-    }, this.handleSendState)
+    let players = [...this.state.players]
+    const index = players.indexOf(this.myPlayer())
+    players[index] = player1
+
+    // if (player1) {
+      this.setState({
+        ...this.state,
+        players: players,
+      }, this.handleSendState)
+    // }
   }
 
   tileCanBeExploded = (tile) => {
@@ -221,7 +209,6 @@ class Game extends Component {
     if (this.state.board[y][x] === 2) {
       this.explodeBomb(bomb_tile)
     }
-
   }
 
   explodeBomb = (bomb_tile) => {
@@ -298,6 +285,30 @@ class Game extends Component {
     // })
   }
 
+  generateBlocks = () => {
+    let blockCount = 100
+    let board = [...this.state.board]
+    let notBlocks = []
+    this.state.players.forEach((player) => {
+      notBlocks.push(`${player.x},${player.y}`)
+      notBlocks.push(`${player.x-1},${player.y}`)
+      notBlocks.push(`${player.x+1},${player.y}`)
+      notBlocks.push(`${player.x},${player.y+1}`)
+      notBlocks.push(`${player.x},${player.y-1}`)
+    })
+    board.forEach((row, rowIndex) => {
+      row.forEach((tile, columnIndex) => {
+        const coordinates = `${columnIndex},${rowIndex}`
+        if(!notBlocks.includes(coordinates) && blockCount > 0 && board[rowIndex][columnIndex] !== 0 && Math.round(Math.random() * 1)){
+          board[rowIndex][columnIndex] = 5
+          blockCount -= 1
+        }
+      })
+    })
+    this.setState({
+      board: board
+    })
+  }
 
   componentDidMount(){
     this.subscribe([
@@ -305,14 +316,42 @@ class Game extends Component {
    ])
   //  LEFT, RIGHT, UP, DOWN, SPACE
 
-  console.log('mounted')
+  // this.generateBlocks()
+
+  // { player: 2, x: 11, y: 1, isAlive: true, color: 'blue', player_id: undefined },
+
   this.props.cableApp.state = this.props.cableApp.cable.subscriptions.create({channel: "GameChannel", room: "One" },
-     {
-       received: (state) => {
-         this.setState({ ...state })
-       }
-     })
-    console.log(this.props.cableApp.board)
+   {
+     received: (state) => {
+       this.setState({ ...state })
+     }
+   })
+  }
+
+  checkPlayers = (players, playerId) => {
+    for (let i = 0 ; i < players.length; i++ ) {
+      if(players[i].player_id === playerId) {
+        return true
+      }
+    }
+    return false
+  }
+
+  handleClick = (event) => {
+    event.preventDefault()
+    const index = this.state.players.length
+    const array = [{x: 1, y: 1}, {x: 11, y: 1}]
+    const startingCrd = array[index]
+    let newState = {...this.state}
+
+    if (!this.checkPlayers(this.state.players, this.player_id)) {
+      newState.players = newState.players.filter(player => !!player.x)
+      newState.players.push({player: index+1, ...startingCrd, isAlive: true, color: 'white', player_id: this.player_id })
+    }
+    this.setState({
+      ...newState,
+    }, this.handleSendState)
+
   }
 
   render(){
@@ -320,6 +359,7 @@ class Game extends Component {
       <div>
         <h1>Hackerman</h1>
         <h3>HACK OR BE HACKED</h3>
+        <JoinButton onClick={this.handleClick}/>
 
         <BoardView board={this.state.board} players={this.state.players} character={this.state.character} timeExplode={this.timerGoOff}/>
 

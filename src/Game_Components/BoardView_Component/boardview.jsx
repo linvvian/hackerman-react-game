@@ -2,6 +2,7 @@ import React from 'react'
 import './boardview.css'
 import Character from '../Character_Component/character'
 import Bomb from '../Bomb_Component/bomb'
+import Block from '../Block_Component/block'
 import {Icon} from 'semantic-ui-react'
 
 class BoardView extends React.Component {
@@ -29,6 +30,12 @@ class BoardView extends React.Component {
       return (
         <td className='tile activeTile'>
           <Bomb timeExplode={this.props.timeExplode} tile={{x:columnIndex, y:rowIndex}} />
+        </td>
+      )
+    } else if(tileValue === 5){
+      return (
+        <td className='tile activeTile'>
+          <Block />
         </td>
       )
     } else if(tileValue > 2){
