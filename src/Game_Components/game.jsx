@@ -421,9 +421,7 @@ class Game extends Component {
       })
     }
 
-    this.setState({
-      board: board,
-    })
+    this.handleSendState(board, 'board')
   }
 
   checkPlayers = (players, playerId) => {
@@ -466,9 +464,6 @@ class Game extends Component {
     })
     newState.board = [...initBoard]
     this.generateBlocks()
-    this.setState({
-      ...newState,
-    })
   }
 
   render(){
