@@ -53,20 +53,18 @@ class Game extends Component {
      received: (state) => {
        console.log(state, 'new state in receiving')
        if (state.board) { this.setState({ board: state.board }) }
-       if (state.players) {
-         this.setState({ players: [...state.players] }, console.log(this.state.players, 'in playersSS'))
-       }
+       if (state.players) { this.setState({ players: [...state.players] }) }
        if (state.player) {
          const newBoard = [...this.state.board]
          let tileSteppedOn = newBoard[state.player.y][state.player.x]
          if (tileSteppedOn === 2 || tileSteppedOn ===3) {
            tileSteppedOn = 1
          }
-         const index = this.state.players.indexOf(state)
+         const index = state.player.player - 1
          let allPlayers = [...this.state.players]
          allPlayers[index] = state.player
 
-         console.log(allPlayers, newBoard, 'in player')
+         console.log(allPlayers, 'in player')
 
          this.setState({
           board: newBoard,
