@@ -57,14 +57,13 @@ class Game extends Component {
        if (state.player) {
          const newBoard = [...this.state.board]
          let tileSteppedOn = newBoard[state.player.y][state.player.x]
+         console.log(tileSteppedOn, 'stepped on')
          if (tileSteppedOn === 2 || tileSteppedOn ===3) {
            tileSteppedOn = 1
          }
          const index = state.player.player - 1
          let allPlayers = [...this.state.players]
          allPlayers[index] = state.player
-
-         console.log(allPlayers, 'in player')
 
          this.setState({
           board: newBoard,
@@ -100,7 +99,6 @@ class Game extends Component {
     return result
   }
 
-
    handleSendState = (newValue, type) => {
      console.log(newValue, type)
      switch (type) {
@@ -130,7 +128,6 @@ class Game extends Component {
     window.addEventListener('keyup', this.up)
   }
 
-
   down = (event) => {
     let keyPressed = event.keyCode
     event.preventDefault()
@@ -143,20 +140,26 @@ class Game extends Component {
 
   isTileValid = (direction, character) => {
     const { x, y } = character
+    let board = [...this.state.board]
     if(!character.isAlive) return
     let nextTile
+    let coordinate
     switch (direction) {
       case 'LEFT':
-        nextTile = this.state.board[y][x-1]
+        nextTile = board[y][x-1]
+        coordinate = { x: x-1, y }
         break;
       case 'RIGHT':
-        nextTile = this.state.board[y][x+1]
+        nextTile = board[y][x+1]
+        coordinate = { x: x+1, y }
         break;
       case 'UP':
-        nextTile = this.state.board[y-1][x]
+        nextTile = board[y-1][x]
+        coordinate = { x, y: y-1 }
         break;
       case 'DOWN':
-        nextTile = this.state.board[y+1][x]
+        nextTile = board[y+1][x]
+        coordinate = { x, y: y+1 }
         break;
       default:
     }
@@ -167,12 +170,18 @@ class Game extends Component {
         break
       case 2:
         character.bombs += 1
+        board[coordinate.y][coordinate.x] = 1
         return true
+        break
       case 3:
         if (character.blast < 9) {character.blast += 1}
+        board[coordinate.y][coordinate.x] = 1
         return true
+        break
       default:
     }
+
+    this.handleSendState(board, 'board')
   }
 
   isPowerUp = (tileValue) => {
