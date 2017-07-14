@@ -46,6 +46,8 @@ class Game extends Component {
    ])
   //  LEFT, RIGHT, UP, DOWN, SPACE
 
+  // this.generateBlocks()
+
   this.props.cableApp.state = this.props.cableApp.cable.subscriptions.create({channel: "GameChannel", room: "One" },
    {
      received: (state) => {
@@ -317,7 +319,7 @@ class Game extends Component {
 
     this.setState({
       players: [...players]
-    }, this.handleSendState)
+    })
 
     return isDead
   }
@@ -417,7 +419,7 @@ class Game extends Component {
     this.generateBlocks()
     this.setState({
       ...newState,
-    }, this.handleSendState)
+    })
   }
 
   render(){
