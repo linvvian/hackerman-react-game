@@ -31,19 +31,25 @@ class BoardView extends React.Component {
           <Block />
         </td>
       )
-    } else if(tileValue === 3 || tileValue === 2){
+    } else if(tileValue === 2){
       return (
         <td className='tile activeTile'>
-          powerUp
+          bomb+1
         </td>
       )
-    } else if(tileValue > 5 && tileValue < 11){
+    } else if(tileValue === 3){
+      return (
+        <td className='tile activeTile'>
+          blast+1
+        </td>
+      )
+    }else if(tileValue > 10 && tileValue < 50){
       return (
         <td className='tile activeTile'>
           <Bomb timeExplode={this.props.timeExplode} tile={{x:columnIndex, y:rowIndex}} />
         </td>
       )
-    } else if(tileValue > 10){
+    } else if(tileValue >= 50){
       return (
         <td className='tile activeTile'>
           <Icon name='fire' />
