@@ -294,7 +294,10 @@ class Game extends Component {
     } //end for
     let players = [...this.state.players]
     players[bombDetails.playerNum - 1].bombs += 1
-    this.setState({board, players}, () => this.postExplode(tilesToExplode, chainedBombs))
+    this.setState({board, players}, () => {
+      this.postExplode(tilesToExplode, chainedBombs)
+      this.handleSendState
+    })
   }
 
   isPlayerDead = (bombRadii) => {
@@ -314,7 +317,7 @@ class Game extends Component {
 
     this.setState({
       players: [...players]
-    })
+    }, this.handleSendState)
 
     return isDead
   }
@@ -338,7 +341,7 @@ class Game extends Component {
         board[y][x] -= 1
       }
     }
-    this.setState({board})
+    this.setState({board}, this.handleSendState)
   }
 
   generateBlocks = () => {
@@ -367,7 +370,7 @@ class Game extends Component {
 
     this.setState({
       board: board,
-    })
+    }, this.handleSendState)
   }
 
   checkPlayers = (players, playerId) => {
@@ -410,10 +413,11 @@ class Game extends Component {
       player.y = array[index].y
       player.isAlive = true
     })
+    newState.board = [...initBoard]
     this.generateBlocks()
     this.setState({
       ...newState,
-    })
+    }, this.handleSendState)
   }
 
   render(){
