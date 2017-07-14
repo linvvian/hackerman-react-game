@@ -51,7 +51,37 @@ class Game extends Component {
   this.props.cableApp.state = this.props.cableApp.cable.subscriptions.create({channel: "GameChannel", room: "One" },
    {
      received: (state) => {
-       this.setState({ ...state })
+       console.log(state, 'in receiving')
+       if (state.board) { this.setState({ board: state.board }) }
+       if (state.player) {
+         const newBoard = this.state.board
+         let tileSteppedOn = newBoard[state.player.y][state.player.x]
+         if (tileSteppedOn === 2 || tileSteppedOn ===3) {
+           tileSteppedOn = 1
+         }
+         const index = this.state.players.indexOf(state)
+         let allPlayers = [...this.state.players]
+         allPlayers[index] = state.player
+         this.setState({
+          board: newBoard,
+          players: allPlayers,
+         })
+       }
+       if (state.bomb) {
+         const wholeBoard = [...this.state.board]
+         wholeBoard[state.bomb.y][state.bomb.x] = state.bomb.value
+         this.setState({
+           board: wholeBoard,
+         })
+       }
+       if (state.powerUp) {
+         const wholeBoard = [...this.state.board]
+         wholeBoard[state.powerUp.y][state.powerUp.x] = state.powerUp.value
+         this.setState({
+           board: wholeBoard,
+         })
+       }
+      //  this.setState({ ...state })
      }
    })
   }
@@ -67,8 +97,23 @@ class Game extends Component {
   }
 
 
-   handleSendState = () => {
-     this.props.cableApp.state.send({...this.state})
+   handleSendState = (newValue, type) => {
+     console.log(newValue, type)
+     switch (type) {
+      case 'board':
+        this.props.cableApp.state.send({board: newValue})
+         break
+      case 'players':
+        this.props.cableApp.state.send({player: newValue})
+         break
+      case 'bomb':
+        this.props.cableApp.state.send({bomb: newValue})
+         break
+      case 'powerUp':
+        this.props.cableApp.state.send({powerUp: newValue})
+        break
+       default:
+     }
    }
 
    //listeners and movement functions
@@ -162,12 +207,10 @@ class Game extends Component {
         break;
       case 32: //SPACEBAR BOMB
         if (player1.bombs === 0) return
-        board[player1.y][player1.x] = player1.player * 10 + player1.blast
-        // const bomb1 = { x: player1.x, y: player1.y}
+        const bombValue = player1.player * 10 + player1.blast
+        const bomb1 = { x: player1.x, y: player1.y, value: bombValue }
         player1.bombs -= 1
-        this.setState({
-          board: board,
-        }, this.handleSendState)
+        this.handleSendState(bomb1, 'bomb')
         break
       default:
     }
@@ -176,11 +219,7 @@ class Game extends Component {
     const index = players.indexOf(this.myPlayer())
     players[index] = player1
 
-      this.setState({
-        ...this.state,
-        players: players,
-        board
-      }, this.handleSendState)
+    this.handleSendState(player1, 'players')
   }
 
   //explosion functions
@@ -282,7 +321,12 @@ class Game extends Component {
         board[y][x] = 50
       } else if (tile_value === 5) {
         let tileValues = [2,3,50,50,50,50,50,50,50]
-        board[y][x] = shuffle(tileValues)[0]
+        board[y][x] = 50
+        const newPower = shuffle(tileValues)[0]
+        if (newPower === 2 || newPower ===3) {
+          const powerUp = {x: x, y: y,  value: newPower}
+          this.handleSendState(powerUp, 'powerUp')
+        }
       } else if (tile_value > 10 && tile_value < 50) {
         if ( x !== bomb.x || y !== bomb.y) {
               const newBomb = {x, y, value: tile_value}
