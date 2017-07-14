@@ -51,8 +51,9 @@ class Game extends Component {
   this.props.cableApp.state = this.props.cableApp.cable.subscriptions.create({channel: "GameChannel", room: "One" },
    {
      received: (state) => {
-       console.log(state, 'in receiving')
+       console.log(this.state, state, 'in receiving')
        if (state.board) { this.setState({ board: state.board }) }
+       if (state.players) { this.setState({ players: state.players }) }
        if (state.player) {
          const newBoard = this.state.board
          let tileSteppedOn = newBoard[state.player.y][state.player.x]
@@ -104,6 +105,9 @@ class Game extends Component {
         this.props.cableApp.state.send({board: newValue})
          break
       case 'players':
+        this.props.cableApp.state.send({players: newValue})
+         break
+      case 'player':
         this.props.cableApp.state.send({player: newValue})
          break
       case 'bomb':
@@ -444,9 +448,7 @@ class Game extends Component {
       newState.players.push({player: index+1, ...startingCrd, isAlive: true, color: colors[index], player_id: this.player_id, blast:1, bombs: 1 })
     }
 
-    this.setState({
-      ...newState,
-    })
+    this.handleSendState(newState.players, 'players')
 
   }
 
