@@ -400,7 +400,7 @@ class Game extends Component {
 
     this.setState({
       ...newState,
-    }, this.handleSendState)
+    })
 
   }
 
@@ -417,7 +417,7 @@ class Game extends Component {
     this.generateBlocks()
     this.setState({
       ...newState,
-    }, this.handleSendState)
+    })
   }
 
   render(){
