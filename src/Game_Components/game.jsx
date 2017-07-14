@@ -51,11 +51,13 @@ class Game extends Component {
   this.props.cableApp.state = this.props.cableApp.cable.subscriptions.create({channel: "GameChannel", room: "One" },
    {
      received: (state) => {
-       console.log(this.state, state, 'in receiving')
+       console.log(state, 'new state in receiving')
        if (state.board) { this.setState({ board: state.board }) }
-       if (state.players) { this.setState({ players: state.players }) }
+       if (state.players) {
+         this.setState({ players: [...state.players] }, console.log(this.state.players, 'in playersSS'))
+       }
        if (state.player) {
-         const newBoard = this.state.board
+         const newBoard = [...this.state.board]
          let tileSteppedOn = newBoard[state.player.y][state.player.x]
          if (tileSteppedOn === 2 || tileSteppedOn ===3) {
            tileSteppedOn = 1
@@ -63,6 +65,9 @@ class Game extends Component {
          const index = this.state.players.indexOf(state)
          let allPlayers = [...this.state.players]
          allPlayers[index] = state.player
+
+         console.log(allPlayers, newBoard, 'in player')
+
          this.setState({
           board: newBoard,
           players: allPlayers,
@@ -223,7 +228,7 @@ class Game extends Component {
     const index = players.indexOf(this.myPlayer())
     players[index] = player1
 
-    this.handleSendState(player1, 'players')
+    this.handleSendState(player1, 'player')
   }
 
   //explosion functions
@@ -447,7 +452,7 @@ class Game extends Component {
       newState.players = newState.players.filter(player => !!player.x)
       newState.players.push({player: index+1, ...startingCrd, isAlive: true, color: colors[index], player_id: this.player_id, blast:1, bombs: 1 })
     }
-
+    console.log(newState.players, 'onClick')
     this.handleSendState(newState.players, 'players')
 
   }
@@ -475,8 +480,7 @@ class Game extends Component {
         <h3>HACK OR BE HACKED</h3>
         <JoinButton onClick={this.handleClick}/>
         <StartButton onClick={this.startGame}/>
-
-        <BoardView board={this.state.board} players={this.state.players} character={this.state.character} timeExplode={this.timerGoOff}/>
+        <BoardView board={this.state.board} players={this.state.players} timeExplode={this.timerGoOff}/>
 
       </div>
     )
