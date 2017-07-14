@@ -59,7 +59,7 @@ class Game extends Component {
          let tileSteppedOn = newBoard[state.player.y][state.player.x]
          console.log(tileSteppedOn, 'stepped on')
          if (tileSteppedOn === 2 || tileSteppedOn ===3) {
-           tileSteppedOn = 1
+           newBoard[state.player.y][state.player.x] = 1
          }
          const index = state.player.player - 1
          let allPlayers = [...this.state.players]
