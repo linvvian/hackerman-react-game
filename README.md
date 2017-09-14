@@ -1,6 +1,6 @@
 # Hackerman
 
-This is a game inspired by the classic Bomberman. It uses Rails ActionCable to handle message passing with websockets, and React for rendering the frontend of the game.
+A multi-player game, where you navigate your way through the map, past obstacles to defeat other players by explosions, reminiscent of the classical Super Bomberman from Hudson Soft.
 
 ## Demo
 link: https://youtu.be/ZT2D7NcsgyM
