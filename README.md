@@ -1,6 +1,6 @@
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
+# Hackerman
 
-Below you will find some information on how to perform common tasks.<br>
-You can find the most recent version of this guide [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md).
+This is a game inspired by the classic Bomberman. It uses Rails ActionCable to handle message passing with websockets, and React for rendering the frontend of the game.
 
-## Table of Contents
+## Demo
+link: https://youtu.be/ZT2D7NcsgyM

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import BoardView from './BoardView_Component/boardview'
 import JoinButton from './Button_Component/join_game_button'
 import StartButton from './Button_Component/start_game_button'
+import './game.css'
 
 const initBoard = [
 [0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -449,7 +450,7 @@ class Game extends Component {
     if(this.myPlayer() || this.state.players.length >= 4) return
 
     const index = this.state.players.length
-    const array = [{x: 1, y: 1}, {x: 11, y: 1}, {}]
+    const array = [{x: 1, y: 1}, {x: 11, y: 1}, {x: 1, y: 13}, {x: 11, y: 13}]
     const startingCrd = array[index]
     let newState = {...this.state}
     const colors = ['white', 'blue', 'green', 'gray']
@@ -477,12 +478,12 @@ class Game extends Component {
 
   render(){
     return(
-      <div>
+      <div id='game'>
         <h1>Hackerman</h1>
         <h3>HACK OR BE HACKED</h3>
         <JoinButton onClick={this.handleClick}/>
         <StartButton onClick={this.startGame}/>
-        <BoardView board={this.state.board} players={this.state.players} timeExplode={this.timerGoOff}/>
+        <BoardView id='board' board={this.state.board} players={this.state.players} timeExplode={this.timerGoOff}/>
 
       </div>
     )
